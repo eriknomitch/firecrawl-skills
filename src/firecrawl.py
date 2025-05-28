@@ -5,15 +5,14 @@ A comprehensive wrapper for the Firecrawl API with organized methods for differe
 
 from ipdb import set_trace as st
 from src.utility import get_firecrawl_api_key
-from firecrawl import FirecrawlApp
+from firecrawl import FirecrawlApp, JsonConfig
 import click
 import json
 import time
 from typing import Dict, List, Optional, Union, Any
 from pathlib import Path
 import pandas as pd
-from pydantic import BaseModel
-from firecrawl import FirecrawlApp
+from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
 FIRECRAWL_API_KEY = get_firecrawl_api_key()
@@ -42,21 +41,6 @@ class FirecrawlWrapper:
     # ============================================================================
 
     def scrape_basic(self, url: str, formats: List[str] = None) -> Dict[str, Any]:
-        """
-        Perform basic web scraping of a single URL.
-
-        Args:
-            url: The URL to scrape
-            formats: List of desired output formats. Defaults to ['markdown']
-
-        Returns:
-            Dictionary containing scraped data
-
-        Example:
-            >>> wrapper = FirecrawlWrapper()
-            >>> data = wrapper.scrape_basic('https://example.com')
-            >>> print(data['markdown'])
-        """
         if formats is None:
             formats = ["markdown"]
 
@@ -216,47 +200,21 @@ class FirecrawlWrapper:
         prompt: str,
         system_prompt: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """
-        Extract structured data using a Pydantic schema.
-
-        Args:
-            url: The URL to scrape
-            schema: Pydantic model or dictionary schema
-            prompt: Extraction prompt
-            system_prompt: Optional system prompt
-
-        Returns:
-            Dictionary containing structured extracted data
-
-        Example:
-            >>> from pydantic import BaseModel, Field
-            >>>
-            >>> class Article(BaseModel):
-            ...     title: str = Field(description="Article title")
-            ...     url: str = Field(description="Article URL")
-            >>>
-            >>> data = wrapper.extract_structured_data(
-            ...     'https://news.site.com',
-            ...     Article,
-            ...     "Extract article information"
-            ... )
-        """
-        # Convert Pydantic model to JSON schema if needed
-        if hasattr(schema, "model_json_schema"):
-            json_schema = schema.model_json_schema()
-        else:
-            json_schema = schema
-
-        params = {
-            "formats": ["extract"],
-            "extract": {"schema": json_schema, "prompt": prompt},
-        }
-
-        if system_prompt:
-            params["extract"]["systemPrompt"] = system_prompt
-
         try:
-            return self.app.scrape_url(url, params=params)
+            json_config = JsonConfig(
+                extractionSchema=schema.model_json_schema(),
+                mode="llm-extraction",
+                pageOptions={"onlyMainContent": True},
+                prompt=prompt,
+                systemPrompt=system_prompt,
+            )
+
+            return self.app.scrape_url(
+                url,
+                formats=["json"],
+                mode="llm-extract",
+                json_options=json_config,
+            )
         except Exception as e:
             print(f"Error extracting structured data from {url}: {str(e)}")
             return None
@@ -617,38 +575,25 @@ class FirecrawlWrapper:
 # ============================================================================
 # EXAMPLE USAGE AND HELPER FUNCTIONS
 # ============================================================================
+class NewsArticle(BaseModel):
+    title: str = Field(description="The title of the news article")
+    url: str = Field(description="The URL of the news article")
+    author: str = Field(description="The author of the news article")
+    date: str = Field(description="Publication date")
+    summary: str = Field(description="Brief summary of the article")
 
 
-def create_news_schema():
-    """Example schema for news article extraction."""
-    from pydantic import BaseModel, Field
-
-    class NewsArticle(BaseModel):
-        title: str = Field(description="The title of the news article")
-        url: str = Field(description="The URL of the news article")
-        author: str = Field(description="The author of the news article")
-        date: str = Field(description="Publication date")
-        summary: str = Field(description="Brief summary of the article")
-
-    class NewsSchema(BaseModel):
-        articles: List[NewsArticle] = Field(description="List of news articles")
-
-    return NewsSchema
+class NewsSchema(BaseModel):
+    articles: List[NewsArticle] = Field(description="List of news articles")
 
 
-def create_product_schema():
-    """Example schema for product data extraction."""
-    from pydantic import BaseModel, Field
-
-    class Product(BaseModel):
-        name: str = Field(description="Product name")
-        price: float = Field(description="Product price")
-        currency: str = Field(description="Currency code")
-        description: str = Field(description="Product description")
-        image_url: str = Field(description="Main product image URL")
-        availability: str = Field(description="Product availability status")
-
-    return Product
+class Product(BaseModel):
+    name: str = Field(description="Product name")
+    price: float = Field(description="Product price")
+    currency: str = Field(description="Currency code")
+    description: str = Field(description="Product description")
+    image_url: str = Field(description="Main product image URL")
+    availability: str = Field(description="Product availability status")
 
 
 # =======================================================================
@@ -676,21 +621,21 @@ def run_examples():
 
         # Example 2: Structured extraction
         print("\n=== Structured Extraction ===")
-        schema = create_news_schema()
-        news_data = wrapper.extract_structured_data(
+        scrape_result = wrapper.extract_structured_data(
             "https://news.ycombinator.com",
-            schema,
-            "Extract the top stories with their details",
+            schema=NewsSchema,
+            prompt="Extract the top stories with their details",
         )
-        if news_data and "extract" in news_data:
-            print(f"Extracted {len(news_data['extract'].get('articles', []))} articles")
+
+        if scrape_result:
+            st()
 
         # Example 3: Batch scraping
-        print("\n=== Batch Scraping ===")
-        urls = ["https://example.com", "https://httpbin.org/html"]
-        batch_data = wrapper.batch_scrape_sync(urls)
-        if batch_data:
-            print(f"Scraped {len(batch_data.get('data', []))} URLs")
+        # print("\n=== Batch Scraping ===")
+        # urls = ["https://example.com", "https://httpbin.org/html"]
+        # batch_data = wrapper.batch_scrape_sync(urls)
+        # if batch_data:
+        #     print(f"Scraped {len(batch_data.get('data', []))} URLs")
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")

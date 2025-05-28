@@ -21,3 +21,19 @@ From: https://docs.firecrawl.dev/introduction
 - Media parsing: pdfs, docx, images.
 - Reliability first: designed to get the data you need - no matter how hard it is.
 - Actions: click, scroll, input, wait and more before extracting data
+
+```
+curl -X POST https://api.firecrawl.dev/v1/scrape \
+    -H '
+    Content-Type: application/json' \
+    -H 'Authorization : Bearer YOUR_API_KEY' \
+    -d '{
+      "url": "https://docs.firecrawl.dev",
+      "formats": ["markdown", "links", "html", "rawHtml", "screenshot"],
+      "includeTags": ["h1", "p", "a", ".main-content"],
+      "excludeTags": ["#ad", "#footer"],
+      "onlyMainContent": false,
+      "waitFor": 1000,
+      "timeout": 15000
+    }'
+```
