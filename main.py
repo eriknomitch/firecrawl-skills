@@ -1,6 +1,7 @@
 from ipdb import set_trace as st
 import click
 from src.utility import get_firecrawl_api_key
+from src.firecrawl import run_examples
 from dotenv import load_dotenv
 import os
 
@@ -33,6 +34,13 @@ def scratch_command():
     print("Running scratch command...")
     # You can add the logic from src/scratch.py here or import and call it
     # For now, it just prints a message.
+
+
+@main.command("firecrawl-examples")
+def firecrawl_examples_command():
+    """Runs the Firecrawl examples."""
+    print("Running Firecrawl examples...")
+    run_examples()
 
 
 @main.command("help")

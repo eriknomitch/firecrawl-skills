@@ -4,7 +4,7 @@ A comprehensive wrapper for the Firecrawl API with organized methods for differe
 """
 
 from ipdb import set_trace as st
-from src.utils import get_api_key
+from src.utility import get_firecrawl_api_key
 from firecrawl import FirecrawlApp
 import click
 import json
@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 
 FIRECRAWL_API_KEY = get_firecrawl_api_key()
 
-@app = FirecrawlApp(api_key=FIRECRAWL_API_KEY)
+app = FirecrawlApp(api_key=FIRECRAWL_API_KEY)
 
 class FirecrawlWrapper:
     """
@@ -635,8 +635,7 @@ def create_product_schema():
 # MAIN EXECUTION BLOCK
 # =======================================================================
 
-# Example usage
-if __name__ == "__main__":
+def run_examples():
     # Initialize wrapper
     wrapper = FirecrawlWrapper()
 
@@ -663,4 +662,8 @@ if __name__ == "__main__":
     batch_data = wrapper.batch_scrape_sync(urls)
     if batch_data:
         print(f"Scraped {len(batch_data.get('data', []))} URLs")
+
+    st()
+
+    return wrapper
 
