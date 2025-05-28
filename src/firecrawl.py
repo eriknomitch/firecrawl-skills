@@ -20,6 +20,7 @@ FIRECRAWL_API_KEY = get_firecrawl_api_key()
 
 app = FirecrawlApp(api_key=FIRECRAWL_API_KEY)
 
+
 class FirecrawlWrapper:
     """
     A comprehensive wrapper for Firecrawl API with organized scraping methods.
@@ -32,7 +33,9 @@ class FirecrawlWrapper:
         Args:
             api_key: Optional API key. If not provided, will use FIRECRAWL_API_KEY from environment.
         """
-        self.app = FirecrawlApp(api_key=FIRECRAWL_API_KEY) if api_key else FirecrawlApp()
+        self.app = (
+            FirecrawlApp(api_key=FIRECRAWL_API_KEY) if api_key else FirecrawlApp()
+        )
 
     # ============================================================================
     # BASIC SCRAPING METHODS
@@ -55,7 +58,7 @@ class FirecrawlWrapper:
             >>> print(data['markdown'])
         """
         if formats is None:
-            formats = ['markdown']
+            formats = ["markdown"]
 
         try:
             return self.app.scrape_url(url, formats=formats)
@@ -63,10 +66,13 @@ class FirecrawlWrapper:
             print(f"Error scraping {url}: {str(e)}")
             return None
 
-    def scrape_multiple_formats(self, url: str,
-                                formats: List[str] = None,
-                                include_screenshot: bool = False,
-                                full_page_screenshot: bool = False) -> Dict[str, Any]:
+    def scrape_multiple_formats(
+        self,
+        url: str,
+        formats: List[str] = None,
+        include_screenshot: bool = False,
+        full_page_screenshot: bool = False,
+    ) -> Dict[str, Any]:
         """
         Scrape a URL with multiple output formats.
 
@@ -87,19 +93,22 @@ class FirecrawlWrapper:
             ... )
         """
         if formats is None:
-            formats = ['markdown', 'html']
+            formats = ["markdown", "html"]
 
         if include_screenshot:
-            formats.append('screenshot')
+            formats.append("screenshot")
         if full_page_screenshot:
-            formats.append('screenshot@fullPage')
+            formats.append("screenshot@fullPage")
 
         return self.scrape_basic(url, formats)
 
-    def scrape_with_filters(self, url: str,
-                            include_tags: List[str] = None,
-                            exclude_tags: List[str] = None,
-                            only_main_content: bool = False) -> Dict[str, Any]:
+    def scrape_with_filters(
+        self,
+        url: str,
+        include_tags: List[str] = None,
+        exclude_tags: List[str] = None,
+        only_main_content: bool = False,
+    ) -> Dict[str, Any]:
         """
         Scrape a URL with content filtering options.
 
@@ -123,11 +132,11 @@ class FirecrawlWrapper:
         params = {}
 
         if include_tags:
-            params['includeTags'] = include_tags
+            params["includeTags"] = include_tags
         if exclude_tags:
-            params['excludeTags'] = exclude_tags
+            params["excludeTags"] = exclude_tags
         if only_main_content:
-            params['onlyMainContent'] = True
+            params["onlyMainContent"] = True
 
         try:
             return self.app.scrape_url(url, params=params)
@@ -159,10 +168,13 @@ class FirecrawlWrapper:
     # EXTRACTION METHODS
     # ============================================================================
 
-    def extract_with_prompt(self, url: str,
-                            prompt: str,
-                            system_prompt: Optional[str] = None,
-                            include_screenshot: bool = False) -> Dict[str, Any]:
+    def extract_with_prompt(
+        self,
+        url: str,
+        prompt: str,
+        system_prompt: Optional[str] = None,
+        include_screenshot: bool = False,
+    ) -> Dict[str, Any]:
         """
         Extract specific data using natural language prompts.
 
@@ -182,17 +194,14 @@ class FirecrawlWrapper:
             ... )
             >>> print(data['extract'])
         """
-        formats = ['markdown', 'extract']
+        formats = ["markdown", "extract"]
         if include_screenshot:
-            formats.append('screenshot')
+            formats.append("screenshot")
 
-        params = {
-            'formats': formats,
-            'extract': {'prompt': prompt}
-        }
+        params = {"formats": formats, "extract": {"prompt": prompt}}
 
         if system_prompt:
-            params['extract']['systemPrompt'] = system_prompt
+            params["extract"]["systemPrompt"] = system_prompt
 
         try:
             return self.app.scrape_url(url, params=params)
@@ -200,10 +209,13 @@ class FirecrawlWrapper:
             print(f"Error extracting from {url}: {str(e)}")
             return None
 
-    def extract_structured_data(self, url: str,
-                                schema: Union[Dict, BaseModel],
-                                prompt: str,
-                                system_prompt: Optional[str] = None) -> Dict[str, Any]:
+    def extract_structured_data(
+        self,
+        url: str,
+        schema: Union[Dict, BaseModel],
+        prompt: str,
+        system_prompt: Optional[str] = None,
+    ) -> Dict[str, Any]:
         """
         Extract structured data using a Pydantic schema.
 
@@ -230,21 +242,18 @@ class FirecrawlWrapper:
             ... )
         """
         # Convert Pydantic model to JSON schema if needed
-        if hasattr(schema, 'model_json_schema'):
+        if hasattr(schema, "model_json_schema"):
             json_schema = schema.model_json_schema()
         else:
             json_schema = schema
 
         params = {
-            'formats': ['extract'],
-            'extract': {
-                'schema': json_schema,
-                'prompt': prompt
-            }
+            "formats": ["extract"],
+            "extract": {"schema": json_schema, "prompt": prompt},
         }
 
         if system_prompt:
-            params['extract']['systemPrompt'] = system_prompt
+            params["extract"]["systemPrompt"] = system_prompt
 
         try:
             return self.app.scrape_url(url, params=params)
@@ -256,9 +265,12 @@ class FirecrawlWrapper:
     # INTERACTIVE SCRAPING METHODS
     # ============================================================================
 
-    def scrape_with_actions(self, url: str,
-                            actions: List[Dict[str, Any]],
-                            extraction_params: Optional[Dict] = None) -> Dict[str, Any]:
+    def scrape_with_actions(
+        self,
+        url: str,
+        actions: List[Dict[str, Any]],
+        extraction_params: Optional[Dict] = None,
+    ) -> Dict[str, Any]:
         """
         Scrape a page after performing interactive actions.
 
@@ -279,14 +291,11 @@ class FirecrawlWrapper:
             ... ]
             >>> data = wrapper.scrape_with_actions('https://example.com', actions)
         """
-        params = {
-            'formats': ['markdown'],
-            'actions': actions
-        }
+        params = {"formats": ["markdown"], "actions": actions}
 
         if extraction_params:
-            params['formats'].append('extract')
-            params['extract'] = extraction_params
+            params["formats"].append("extract")
+            params["extract"] = extraction_params
 
         try:
             return self.app.scrape_url(url, params=params)
@@ -294,10 +303,13 @@ class FirecrawlWrapper:
             print(f"Error scraping {url} with actions: {str(e)}")
             return None
 
-    def scrape_dynamic_content(self, url: str,
-                               wait_for_selector: str = None,
-                               wait_time: int = 3000,
-                               click_elements: List[str] = None) -> Dict[str, Any]:
+    def scrape_dynamic_content(
+        self,
+        url: str,
+        wait_for_selector: str = None,
+        wait_time: int = 3000,
+        click_elements: List[str] = None,
+    ) -> Dict[str, Any]:
         """
         Scrape dynamic content that requires waiting or clicking.
 
@@ -333,9 +345,12 @@ class FirecrawlWrapper:
     # BATCH SCRAPING METHODS
     # ============================================================================
 
-    def batch_scrape_sync(self, urls: List[str],
-                          formats: List[str] = None,
-                          extraction_params: Optional[Dict] = None) -> Dict[str, Any]:
+    def batch_scrape_sync(
+        self,
+        urls: List[str],
+        formats: List[str] = None,
+        extraction_params: Optional[Dict] = None,
+    ) -> Dict[str, Any]:
         """
         Scrape multiple URLs synchronously in a batch.
 
@@ -354,14 +369,14 @@ class FirecrawlWrapper:
             ...     print(item['markdown'])
         """
         if formats is None:
-            formats = ['markdown']
+            formats = ["markdown"]
 
-        params = {'formats': formats}
+        params = {"formats": formats}
 
         if extraction_params:
-            params['extract'] = extraction_params
-            if 'extract' not in formats:
-                params['formats'].append('extract')
+            params["extract"] = extraction_params
+            if "extract" not in formats:
+                params["formats"].append("extract")
 
         try:
             return self.app.batch_scrape_urls(urls, params=params)
@@ -369,9 +384,12 @@ class FirecrawlWrapper:
             print(f"Error in batch scraping: {str(e)}")
             return None
 
-    def batch_scrape_async(self, urls: List[str],
-                           formats: List[str] = None,
-                           extraction_params: Optional[Dict] = None) -> Dict[str, str]:
+    def batch_scrape_async(
+        self,
+        urls: List[str],
+        formats: List[str] = None,
+        extraction_params: Optional[Dict] = None,
+    ) -> Dict[str, str]:
         """
         Submit a batch scraping job to run asynchronously.
 
@@ -388,14 +406,14 @@ class FirecrawlWrapper:
             >>> status = wrapper.check_batch_status(job['id'])
         """
         if formats is None:
-            formats = ['markdown']
+            formats = ["markdown"]
 
-        params = {'formats': formats}
+        params = {"formats": formats}
 
         if extraction_params:
-            params['extract'] = extraction_params
-            if 'extract' not in formats:
-                params['formats'].append('extract')
+            params["extract"] = extraction_params
+            if "extract" not in formats:
+                params["formats"].append("extract")
 
         try:
             return self.app.async_batch_scrape_urls(urls, params=params)
@@ -423,9 +441,9 @@ class FirecrawlWrapper:
             print(f"Error checking batch status: {str(e)}")
             return None
 
-    def wait_for_batch_completion(self, job_id: str,
-                                  poll_interval: int = 30,
-                                  max_wait_time: int = 3600) -> Dict[str, Any]:
+    def wait_for_batch_completion(
+        self, job_id: str, poll_interval: int = 30, max_wait_time: int = 3600
+    ) -> Dict[str, Any]:
         """
         Wait for a batch job to complete and return results.
 
@@ -445,13 +463,15 @@ class FirecrawlWrapper:
             if not status:
                 return None
 
-            if status.get('status') == 'completed':
+            if status.get("status") == "completed":
                 return status
-            elif status.get('status') == 'failed':
+            elif status.get("status") == "failed":
                 print(f"Batch job {job_id} failed")
                 return status
 
-            print(f"Job {job_id}: {status.get('completed', 0)}/{status.get('total', 0)} completed")
+            print(
+                f"Job {job_id}: {status.get('completed', 0)}/{status.get('total', 0)} completed"
+            )
             time.sleep(poll_interval)
 
         print(f"Batch job {job_id} timed out after {max_wait_time} seconds")
@@ -461,12 +481,15 @@ class FirecrawlWrapper:
     # CRAWLING METHODS
     # ============================================================================
 
-    def crawl_website(self, url: str,
-                      limit: int = 100,
-                      max_depth: int = None,
-                      formats: List[str] = None,
-                      include_subdomains: bool = False,
-                      exclude_paths: List[str] = None) -> Dict[str, Any]:
+    def crawl_website(
+        self,
+        url: str,
+        limit: int = 100,
+        max_depth: int = None,
+        formats: List[str] = None,
+        include_subdomains: bool = False,
+        exclude_paths: List[str] = None,
+    ) -> Dict[str, Any]:
         """
         Crawl an entire website and scrape multiple pages.
 
@@ -490,21 +513,18 @@ class FirecrawlWrapper:
             ... )
         """
         if formats is None:
-            formats = ['markdown']
+            formats = ["markdown"]
 
-        scrape_options = {'formats': formats}
+        scrape_options = {"formats": formats}
 
-        crawl_params = {
-            'limit': limit,
-            'scrape_options': scrape_options
-        }
+        crawl_params = {"limit": limit, "scrape_options": scrape_options}
 
         if max_depth is not None:
-            crawl_params['maxDepth'] = max_depth
+            crawl_params["maxDepth"] = max_depth
         if not include_subdomains:
-            crawl_params['allowExternalLinks'] = False
+            crawl_params["allowExternalLinks"] = False
         if exclude_paths:
-            crawl_params['excludePaths'] = exclude_paths
+            crawl_params["excludePaths"] = exclude_paths
 
         try:
             return self.app.crawl_url(url, **crawl_params)
@@ -516,9 +536,9 @@ class FirecrawlWrapper:
     # UTILITY METHODS
     # ============================================================================
 
-    def save_to_json(self, data: Dict[str, Any],
-                     filepath: Union[str, Path],
-                     indent: int = 2) -> bool:
+    def save_to_json(
+        self, data: Dict[str, Any], filepath: Union[str, Path], indent: int = 2
+    ) -> bool:
         """
         Save scraped data to a JSON file.
 
@@ -531,15 +551,14 @@ class FirecrawlWrapper:
             True if successful, False otherwise
         """
         try:
-            with open(filepath, 'w', encoding='utf-8') as f:
+            with open(filepath, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=indent, ensure_ascii=False)
             return True
         except Exception as e:
             print(f"Error saving to JSON: {str(e)}")
             return False
 
-    def save_to_csv(self, data: List[Dict],
-                    filepath: Union[str, Path]) -> bool:
+    def save_to_csv(self, data: List[Dict], filepath: Union[str, Path]) -> bool:
         """
         Save list of dictionaries to CSV file.
 
@@ -568,7 +587,7 @@ class FirecrawlWrapper:
         Returns:
             List of URLs found in the data
         """
-        return data.get('links', [])
+        return data.get("links", [])
 
     def get_metadata(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -580,7 +599,7 @@ class FirecrawlWrapper:
         Returns:
             Metadata dictionary
         """
-        return data.get('metadata', {})
+        return data.get("metadata", {})
 
     def convert_to_dataframe(self, data_list: List[Dict]) -> pd.DataFrame:
         """
@@ -598,6 +617,7 @@ class FirecrawlWrapper:
 # ============================================================================
 # EXAMPLE USAGE AND HELPER FUNCTIONS
 # ============================================================================
+
 
 def create_news_schema():
     """Example schema for news article extraction."""
@@ -635,13 +655,14 @@ def create_product_schema():
 # MAIN EXECUTION BLOCK
 # =======================================================================
 
+
 def run_examples():
     # Initialize wrapper
     wrapper = FirecrawlWrapper()
 
     # Example 1: Basic scraping
     print("=== Basic Scraping ===")
-    data = wrapper.scrape_basic('https://example.com')
+    data = wrapper.scrape_basic("https://example.com")
     if data:
         print(f"Scraped {len(data.get('markdown', ''))} characters")
 
@@ -649,16 +670,16 @@ def run_examples():
     print("\n=== Structured Extraction ===")
     schema = create_news_schema()
     news_data = wrapper.extract_structured_data(
-        'https://news.ycombinator.com',
+        "https://news.ycombinator.com",
         schema,
-        "Extract the top stories with their details"
+        "Extract the top stories with their details",
     )
-    if news_data and 'extract' in news_data:
+    if news_data and "extract" in news_data:
         print(f"Extracted {len(news_data['extract'].get('articles', []))} articles")
 
     # Example 3: Batch scraping
     print("\n=== Batch Scraping ===")
-    urls = ['https://example.com', 'https://httpbin.org/html']
+    urls = ["https://example.com", "https://httpbin.org/html"]
     batch_data = wrapper.batch_scrape_sync(urls)
     if batch_data:
         print(f"Scraped {len(batch_data.get('data', []))} URLs")
@@ -666,4 +687,3 @@ def run_examples():
     st()
 
     return wrapper
-
