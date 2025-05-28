@@ -657,33 +657,43 @@ def create_product_schema():
 
 
 def run_examples():
-    # Initialize wrapper
-    wrapper = FirecrawlWrapper()
 
-    # Example 1: Basic scraping
-    print("=== Basic Scraping ===")
-    data = wrapper.scrape_basic("https://example.com")
-    if data:
-        print(f"Scraped {len(data.get('markdown', ''))} characters")
+    try:
+        # Initialize wrapper
+        wrapper = FirecrawlWrapper()
 
-    # Example 2: Structured extraction
-    print("\n=== Structured Extraction ===")
-    schema = create_news_schema()
-    news_data = wrapper.extract_structured_data(
-        "https://news.ycombinator.com",
-        schema,
-        "Extract the top stories with their details",
-    )
-    if news_data and "extract" in news_data:
-        print(f"Extracted {len(news_data['extract'].get('articles', []))} articles")
+        # Example 1: Basic scraping
+        print("=== Basic Scraping ===")
+        scrape_result = wrapper.scrape_basic(
+            "https://news.ycombinator.com/newsguidelines.html", formats=["markdown"]
+        )
+        if scrape_result:
+            markdown_content = scrape_result.markdown
 
-    # Example 3: Batch scraping
-    print("\n=== Batch Scraping ===")
-    urls = ["https://example.com", "https://httpbin.org/html"]
-    batch_data = wrapper.batch_scrape_sync(urls)
-    if batch_data:
-        print(f"Scraped {len(batch_data.get('data', []))} URLs")
+            print(f"Scraped content length: {len(markdown_content)} characters")
 
-    st()
+            print(markdown_content[:500])
+
+        # Example 2: Structured extraction
+        print("\n=== Structured Extraction ===")
+        schema = create_news_schema()
+        news_data = wrapper.extract_structured_data(
+            "https://news.ycombinator.com",
+            schema,
+            "Extract the top stories with their details",
+        )
+        if news_data and "extract" in news_data:
+            print(f"Extracted {len(news_data['extract'].get('articles', []))} articles")
+
+        # Example 3: Batch scraping
+        print("\n=== Batch Scraping ===")
+        urls = ["https://example.com", "https://httpbin.org/html"]
+        batch_data = wrapper.batch_scrape_sync(urls)
+        if batch_data:
+            print(f"Scraped {len(batch_data.get('data', []))} URLs")
+
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        st()
 
     return wrapper
