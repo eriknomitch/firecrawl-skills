@@ -26,5 +26,13 @@ def scratch_command():
     # For now, it just prints a message.
 
 
+@main.command("help")
+@click.pass_context
+def help_command(ctx):
+    """Shows the help message."""
+    # The parent context is the main command group
+    click.echo(ctx.parent.get_help())
+
+
 if __name__ == "__main__":
     main()
