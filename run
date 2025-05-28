@@ -1,0 +1,3 @@
+#!/usr/bin/env zsh
+
+uv run ipython src/scratch.py $@
