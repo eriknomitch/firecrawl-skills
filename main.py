@@ -1,8 +1,17 @@
 from ipdb import set_trace as st
 import click
-import src.utility
+from src.utility import get_firecrawl_api_key
+from dotenv import load_dotenv
+import os
+
+FIRECRAWL_API_KEY = get_firecrawl_api_key()
+
+print(f"Using Firecrawl API Key: {FIRECRAWL_API_KEY[:10]}... (truncated for security)")
 
 
+# ------------------------------------------------
+# SUBCOMMANDS ------------------------------------
+# ------------------------------------------------
 @click.group(invoke_without_command=True)
 @click.pass_context
 def main(ctx):
