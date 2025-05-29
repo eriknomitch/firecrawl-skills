@@ -1,3 +1,3 @@
 # TODO
 - [ ] Update the README with the latest features and usage instructions.
-- [ ] Move Pydantic models to a separate module for better organization.
+- [ ] Change the name of ExtractSchema to be more specific to its functionality.
