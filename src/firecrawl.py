@@ -4,7 +4,7 @@ from firecrawl import FirecrawlApp, JsonConfig, ScrapeOptions
 import json
 from typing import List
 from dotenv import load_dotenv
-from src.schemas import ExtractSchema
+from src.schemas import CompanyDetailsSchema
 
 FIRECRAWL_API_KEY = get_firecrawl_api_key()
 
@@ -37,7 +37,7 @@ def run_example_structured_extraction():
             "https://www.ycombinator.com/companies/",
         ],
         prompt="Extract the company mission, whether it supports SSO, whether it is open source, and whether it is in Y Combinator from the page.",
-        schema=ExtractSchema.model_json_schema(),
+        schema=CompanyDetailsSchema.model_json_schema(),
     )
 
     print(data)

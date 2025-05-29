@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 
 
-class ExtractSchema(BaseModel):
+class CompanyDetailsSchema(BaseModel):
     company_mission: str
     supports_sso: bool
     is_open_source: bool
