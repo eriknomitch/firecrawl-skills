@@ -65,6 +65,22 @@ def run_example_crawl():
                 print("-" * 80)
 
 
+def run_example_search():
+    # Perform a basic search
+    search_result = app.search("firecrawl web scraping", limit=5)
+
+    # Print the search results
+    if search_result and hasattr(search_result, 'data'):
+        for result in search_result.data:
+            print(f"Title: {result.get('title', 'N/A')}")
+            print(f"URL: {result.get('url', 'N/A')}")
+            print(f"Description: {result.get('description', 'N/A')}")
+            print("-" * 40)
+    else:
+        print("No search results found or an error occurred.")
+        print("search_result:", search_result)
+
+
 # =======================================================================
 def run_examples():
 
@@ -77,6 +93,9 @@ def run_examples():
 
         print("\n=== Crawling ===")
         run_example_crawl()
+
+        print("\n=== Search Example ===")
+        run_example_search()
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
