@@ -1,43 +1,14 @@
-"""
-Firecrawl Python Wrapper
-A comprehensive wrapper for the Firecrawl API with organized methods for different scraping scenarios.
-"""
-
 from ipdb import set_trace as st
 from src.utility import get_firecrawl_api_key
 from firecrawl import FirecrawlApp, JsonConfig, ScrapeOptions
 import json
-from typing import List  # Removed Dict, Optional, Union, Any
-
-# Removed: import click, import time, from pathlib import Path, import pandas as pd
+from typing import List
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
 FIRECRAWL_API_KEY = get_firecrawl_api_key()
 
 app = FirecrawlApp(api_key=FIRECRAWL_API_KEY)
-
-
-# ============================================================================
-class NewsArticle(BaseModel):
-    title: str = Field(description="The title of the news article")
-    url: str = Field(description="The URL of the news article")
-    author: str = Field(description="The author of the news article")
-    date: str = Field(description="Publication date")
-    summary: str = Field(description="Brief summary of the article")
-
-
-class NewsSchema(BaseModel):
-    articles: List[NewsArticle] = Field(description="List of news articles")
-
-
-class Product(BaseModel):
-    name: str = Field(description="Product name")
-    price: float = Field(description="Product price")
-    currency: str = Field(description="Currency code")
-    description: str = Field(description="Product description")
-    image_url: str = Field(description="Main product image URL")
-    availability: str = Field(description="Product availability status")
 
 
 # =======================================================================
@@ -79,14 +50,25 @@ def run_example_structured_extraction():
 
 
 def run_example_crawl():
-    crawl_status = app.crawl_url(
+    crawl_result = app.crawl_url(
         "https://firecrawl.dev",
         limit=10,
         scrape_options=ScrapeOptions(formats=["markdown", "html"]),
         poll_interval=30,
     )
 
-    print(crawl_status)
+    if crawl_result:
+        # List of FirecrawlDocument objects
+        data = crawl_result.data
+
+        print(f"Crawled {len(data)} documents.")
+
+        for doc in data:
+            if hasattr(doc, "markdown"):
+                print(f"Document URL: {doc.url}")
+                print(f"Markdown content length: {len(doc.markdown)} characters")
+                print(doc.markdown[:500])
+                print("-" * 80)
 
 
 # =======================================================================
