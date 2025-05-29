@@ -50,6 +50,8 @@ def help_command(ctx):
     # The parent context is the main command group
     click.echo(ctx.parent.get_help())
 
+main.add_command(help_command, name="h")
+
 
 if __name__ == "__main__":
     main()
