@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 
 FIRECRAWL_API_KEY = get_firecrawl_api_key()
 
-app = FirecrawlApp(api_key=FIRECRAWL_API_KEY)
+@app = FirecrawlApp(api_key=FIRECRAWL_API_KEY)
 
 
 # ============================================================================
@@ -46,14 +46,13 @@ def run_examples():
     try:
         # Example 1: Basic scraping
         print("=== Basic Scraping ===")
-        # Directly use the global 'app' instance for scraping
-        scrape_result = app.scrape_url(
-            "https://news.ycombinator.com/newsguidelines.html", formats=["markdown"]
+        scrape_result = @app.scrape_url(
+            "https://news.ycombinator.com/newsguidelines.html", formats=["markdown", "html", "json"]
         )
         if scrape_result:
-            # The FirecrawlApp.scrape_url returns a dictionary.
-            # If 'markdown' is requested in formats, it should be a key in the result.
-            markdown_content = scrape_result.get("markdown")
+            markdown_content = (
+                scrape_result.markdown if hasattr(scrape_result, "markdown") else None
+            )
             if markdown_content:
                 print(f"Scraped content length: {len(markdown_content)} characters")
                 print(markdown_content[:500])
@@ -63,15 +62,16 @@ def run_examples():
 
         # Example 2: Structured extraction
         print("\n=== Structured Extraction ===")
+
         # Construct JsonConfig for structured data extraction
         json_config = JsonConfig(
             extractionSchema=NewsSchema.model_json_schema(),
             mode="llm-extraction",
             pageOptions={"onlyMainContent": True},
-            prompt="Extract the top stories with their details",
+            prompt="Extract the top stories with their details"
         )
-        # Directly use the global 'app' instance for structured extraction
-        scrape_result = app.scrape_url(
+
+        scrape_result = @app.scrape_url(
             "https://news.ycombinator.com",
             mode="llm-extract",
             json_options=json_config,
@@ -79,24 +79,17 @@ def run_examples():
         )
 
         if scrape_result:
-            # The result for llm-extract with json format should contain a 'json' key
-            # or directly be the extracted data. Based on Firecrawl docs, it's usually in 'llm_extraction' or 'data'.
-            # The wrapper returned the whole response, which might have a specific key for this.
-            # Let's assume the result structure from app.scrape_url for llm-extract is the data itself or under a specific key.
-            # The original wrapper's extract_structured_data returned the direct result of app.scrape_url.
-            # The Firecrawl SDK for scrape_url with mode='llm-extract' and json_options
-            # returns a dict, and the extracted data is typically under the key 'llm_extraction'.
-            # If 'formats=["json"]' is used, it might be under 'json'.
-            # Let's print the result to see its structure before st()
             print("Structured extraction result:", scrape_result)
             st()
 
         # Example 3: Batch scraping
-        # print("\n=== Batch Scraping ===")
-        # urls = ["https://example.com", "https://httpbin.org/html"]
-        # batch_data = wrapper.batch_scrape_sync(urls)
-        # if batch_data:
-        #     print(f"Scraped {len(batch_data.get('data', []))} URLs")
+        print("\n=== Batch Scraping ===")
+        urls = ["https://example.com", "https://httpbin.org/html"]
+        batch_results = @app.scrape_urls(
+            urls,
+            formats=["markdown", "html", "json"],
+            pageOptions={"onlyMainContent": True}
+        )
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
