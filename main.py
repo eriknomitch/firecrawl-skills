@@ -7,7 +7,7 @@ import os
 
 FIRECRAWL_API_KEY = get_firecrawl_api_key()
 
-print(f"Using Firecrawl API Key: {FIRECRAWL_API_KEY[:10]}... (truncated for security)")
+print(f"Using Firecrawl API Key: {FIRECRAWL_API_KEY[:10]}...")
 
 
 # ------------------------------------------------
@@ -18,7 +18,7 @@ print(f"Using Firecrawl API Key: {FIRECRAWL_API_KEY[:10]}... (truncated for secu
 def main(ctx):
     """A CLI for firecrawl-skills."""
     if ctx.invoked_subcommand is None:
-        ctx.invoke(scratch_command)
+        ctx.invoke(repl_command)
 
 
 @main.command("repl")
