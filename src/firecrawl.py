@@ -70,7 +70,7 @@ def run_example_search():
     search_result = app.search("firecrawl web scraping", limit=5)
 
     # Print the search results
-    if search_result and hasattr(search_result, 'data'):
+    if search_result and hasattr(search_result, "data"):
         for result in search_result.data:
             print(f"Title: {result.get('title', 'N/A')}")
             print(f"URL: {result.get('url', 'N/A')}")
