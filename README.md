@@ -1,14 +1,12 @@
-# Firecrawl Skills
+# Firecrawl Skills Test
 
 [eriknomitch](https://erik.is)
 
-2025-05-28T17:12:32-05:00
+**NOTE: This is just for a skills test, not an actual project.**
 
----
+# NOTES/RESOURCES/SCRATCH
 
-# NOTES
-
-https://context7.com/mendableai/firecrawl-docs
+- https://context7.com/mendableai/firecrawl-docs
 
 ## Firecrawl Overview
 From: https://docs.firecrawl.dev/introduction
