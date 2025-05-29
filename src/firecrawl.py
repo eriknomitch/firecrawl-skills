@@ -81,7 +81,7 @@ def run_example_structured_extraction():
 def run_example_crawl():
     crawl_status = app.crawl_url(
         "https://firecrawl.dev",
-        limit=100,
+        limit=10,
         scrape_options=ScrapeOptions(formats=["markdown", "html"]),
         poll_interval=30,
     )
