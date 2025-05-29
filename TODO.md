@@ -18,3 +18,4 @@ for result in search_result.data:
     print(f"URL: {result['url']}")
     print(f"Description: {result['description']}")
 ```
+- [ ] Create a pipeline to scrape a website with Firecrawl then use LiteLLM to summarize the content.
