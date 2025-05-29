@@ -5,6 +5,10 @@ import json
 from typing import List
 from dotenv import load_dotenv
 from src.schemas import CompanyDetailsSchema
+from colorama import Fore, Style, init
+
+# Initialize colorama
+init(autoreset=True)
 
 FIRECRAWL_API_KEY = get_firecrawl_api_key()
 
@@ -22,11 +26,11 @@ def run_example_basic_scraping():
             scrape_result.markdown if hasattr(scrape_result, "markdown") else None
         )
         if markdown_content:
-            print(f"Scraped content length: {len(markdown_content)} characters")
+            print(f"{Fore.CYAN}Scraped content length:{Style.RESET_ALL} {len(markdown_content)} characters")
             print(markdown_content[:500])
         else:
-            print("Markdown content not found in scrape_result.")
-            print("scrape_result:", scrape_result)
+            print(f"{Fore.RED}Markdown content not found in scrape_result.")
+            print(f"{Fore.YELLOW}scrape_result:{Style.RESET_ALL}", scrape_result)
 
 
 def run_example_structured_extraction():
@@ -40,6 +44,7 @@ def run_example_structured_extraction():
         schema=CompanyDetailsSchema.model_json_schema(),
     )
 
+    print(f"{Fore.CYAN}Extracted data:{Style.RESET_ALL}")
     print(data)
 
 
@@ -55,14 +60,14 @@ def run_example_crawl():
         # List of FirecrawlDocument objects
         data = crawl_result.data
 
-        print(f"Crawled {len(data)} documents.")
+        print(f"{Fore.CYAN}Crawled {len(data)} documents.{Style.RESET_ALL}")
 
         for doc in data:
             if hasattr(doc, "markdown"):
-                print(f"Document URL: {doc.url}")
-                print(f"Markdown content length: {len(doc.markdown)} characters")
+                print(f"{Fore.CYAN}Document URL:{Style.RESET_ALL} {doc.url}")
+                print(f"{Fore.CYAN}Markdown content length:{Style.RESET_ALL} {len(doc.markdown)} characters")
                 print(doc.markdown[:500])
-                print("-" * 80)
+                print(f"{Style.DIM}{'-' * 80}{Style.RESET_ALL}")
 
 
 def run_example_search():
@@ -72,35 +77,35 @@ def run_example_search():
     # Print the search results
     if search_result and hasattr(search_result, "data"):
         for result in search_result.data:
-            print(f"Title: {result.get('title', 'N/A')}")
-            print(f"URL: {result.get('url', 'N/A')}")
-            print(f"Description: {result.get('description', 'N/A')}")
-            print("-" * 40)
+            print(f"{Fore.CYAN}Title:{Style.RESET_ALL} {result.get('title', 'N/A')}")
+            print(f"{Fore.CYAN}URL:{Style.RESET_ALL} {result.get('url', 'N/A')}")
+            print(f"{Fore.CYAN}Description:{Style.RESET_ALL} {result.get('description', 'N/A')}")
+            print(f"{Style.DIM}{'-' * 40}{Style.RESET_ALL}")
     else:
-        print("No search results found or an error occurred.")
-        print("search_result:", search_result)
+        print(f"{Fore.RED}No search results found or an error occurred.")
+        print(f"{Fore.YELLOW}search_result:{Style.RESET_ALL}", search_result)
 
 
 # =======================================================================
 def run_examples():
 
     try:
-        print("=== Basic Scraping ===")
+        print(f"{Fore.YELLOW}{Style.BRIGHT}=== Basic Scraping ==={Style.RESET_ALL}")
         run_example_basic_scraping()
 
-        print("\n=== Structured Extraction ===")
+        print(f"\n{Fore.YELLOW}{Style.BRIGHT}=== Structured Extraction ==={Style.RESET_ALL}")
         run_example_structured_extraction()
 
-        print("\n=== Crawling ===")
+        print(f"\n{Fore.YELLOW}{Style.BRIGHT}=== Crawling ==={Style.RESET_ALL}")
         run_example_crawl()
 
-        print("\n=== Search Example ===")
+        print(f"\n{Fore.YELLOW}{Style.BRIGHT}=== Search Example ==={Style.RESET_ALL}")
         run_example_search()
 
     except Exception as e:
-        print(f"An error occurred: {str(e)}")
+        print(f"{Fore.RED}{Style.BRIGHT}An error occurred: {str(e)}{Style.RESET_ALL}")
         st()
 
-    print("Examples completed successfully.")
+    print(f"{Fore.GREEN}{Style.BRIGHT}Examples completed successfully.{Style.RESET_ALL}")
 
     return
