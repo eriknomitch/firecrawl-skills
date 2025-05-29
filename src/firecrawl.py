@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 
 FIRECRAWL_API_KEY = get_firecrawl_api_key()
 
-@app = FirecrawlApp(api_key=FIRECRAWL_API_KEY)
+app = FirecrawlApp(api_key=FIRECRAWL_API_KEY)
 
 
 # ============================================================================
@@ -41,58 +41,58 @@ class Product(BaseModel):
 
 
 # =======================================================================
+def run_example_basic_scraping():
+    scrape_result = app.scrape_url(
+        "https://news.ycombinator.com/newsguidelines.html",
+        formats=["markdown", "html"],
+    )
+    if scrape_result:
+        markdown_content = (
+            scrape_result.markdown if hasattr(scrape_result, "markdown") else None
+        )
+        if markdown_content:
+            print(f"Scraped content length: {len(markdown_content)} characters")
+            print(markdown_content[:500])
+        else:
+            print("Markdown content not found in scrape_result.")
+            print("scrape_result:", scrape_result)
+
+
+def run_example_structured_extraction():
+    class PageSchema(BaseModel):
+        title: str
+        description: str
+
+    # Scrape and extract using the model schema
+    data = app.scrape_url(
+        "https://www.mendable.ai",
+        {
+            "extractorOptions": {
+                "extractionSchema": PageSchema.model_json_schema(),
+                "mode": "llm-extraction",
+            },
+            "pageOptions": {
+                "onlyMainContent": True  # Optional: ignore headers/footers
+            },
+        },
+    )
+
+    # Display extracted structured data
+    print(data["llm_extraction"])
+
+
+# =======================================================================
 def run_examples():
 
     try:
-        # Example 1: Basic scraping
         print("=== Basic Scraping ===")
-        scrape_result = @app.scrape_url(
-            "https://news.ycombinator.com/newsguidelines.html", formats=["markdown", "html", "json"]
-        )
-        if scrape_result:
-            markdown_content = (
-                scrape_result.markdown if hasattr(scrape_result, "markdown") else None
-            )
-            if markdown_content:
-                print(f"Scraped content length: {len(markdown_content)} characters")
-                print(markdown_content[:500])
-            else:
-                print("Markdown content not found in scrape_result.")
-                print("scrape_result:", scrape_result)
+        run_example_basic_scraping()
 
-        # Example 2: Structured extraction
         print("\n=== Structured Extraction ===")
-
-        # Construct JsonConfig for structured data extraction
-        json_config = JsonConfig(
-            extractionSchema=NewsSchema.model_json_schema(),
-            mode="llm-extraction",
-            pageOptions={"onlyMainContent": True},
-            prompt="Extract the top stories with their details"
-        )
-
-        scrape_result = @app.scrape_url(
-            "https://news.ycombinator.com",
-            mode="llm-extract",
-            json_options=json_config,
-            formats=["json"],  # Requesting JSON output for structured data
-        )
-
-        if scrape_result:
-            print("Structured extraction result:", scrape_result)
-            st()
-
-        # Example 3: Batch scraping
-        print("\n=== Batch Scraping ===")
-        urls = ["https://example.com", "https://httpbin.org/html"]
-        batch_results = @app.scrape_urls(
-            urls,
-            formats=["markdown", "html", "json"],
-            pageOptions={"onlyMainContent": True}
-        )
+        run_example_structured_extraction()
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
         st()
 
-    return app
+    print("Examples completed successfully.")
