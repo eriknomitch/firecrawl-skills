@@ -1,3 +1,4 @@
 #!/usr/bin/env zsh
 
-uv run ipython main.py $@
+# Pass all arguments to the script, not ipython
+uv run ipython main.py "$@"
