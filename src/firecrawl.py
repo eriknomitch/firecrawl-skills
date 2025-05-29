@@ -3,8 +3,8 @@ from src.utility import get_firecrawl_api_key
 from firecrawl import FirecrawlApp, JsonConfig, ScrapeOptions
 import json
 from typing import List
-from pydantic import BaseModel, Field
 from dotenv import load_dotenv
+from src.schemas import ExtractSchema
 
 FIRECRAWL_API_KEY = get_firecrawl_api_key()
 
@@ -30,12 +30,6 @@ def run_example_basic_scraping():
 
 
 def run_example_structured_extraction():
-    class ExtractSchema(BaseModel):
-        company_mission: str
-        supports_sso: bool
-        is_open_source: bool
-        is_in_yc: bool
-
     data = app.extract(
         [
             "https://docs.firecrawl.dev/*",
